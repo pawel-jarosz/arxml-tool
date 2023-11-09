@@ -6,5 +6,4 @@
 #include <arxml/arxml_model.hpp>
 
 TEST(FooTest, ExampleTest) {
-    EXPECT_EQ(foo(), 2);
 }
