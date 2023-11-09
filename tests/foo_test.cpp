@@ -3,7 +3,7 @@
 //
 #include <gtest/gtest.h>
 
-#include <arxml/foo.hpp>
+#include <arxml/arxml_model.hpp>
 
 TEST(FooTest, ExampleTest) {
     EXPECT_EQ(foo(), 2);
