@@ -100,6 +100,10 @@ namespace arxml::model::elements {
         double getFloating() override { return m_floating_value; }
         EntryType getType() const noexcept override { return m_type; }
 
+        void addAttribute(std::string name, std::string value) noexcept override {
+            m_element.addAttribute(std::move(name),
+                                   std::move(value));
+        }
         std::optional<std::string> getAttribute(std::string_view name) override { return m_element.getAttribute(name); }
         const std::vector<AttributePair>& getAttributes() const noexcept override { return m_element.getAttributes(); }
         std::string getTag() const noexcept override { return m_element.getTag(); }
@@ -112,15 +116,25 @@ namespace arxml::model::elements {
         EntryType m_type;
     };
 
-    class StringAutosarElement : public AbstractSimpleAutosarElement {
+    class StringAutosarElement : public IStringAutosarElement {
     public:
         explicit StringAutosarElement(std::string tag, std::string text)
-                : AbstractSimpleAutosarElement(std::move(tag))
+                : m_element(std::move(tag))
                 , m_text{std::move(text)} {}
 
         EntryType getType() const noexcept override { return EntryType::STRING_ELEMENT; }
         const std::string& getText() { return m_text; }
+
+        void addAttribute(std::string name, std::string value) noexcept override {
+            m_element.addAttribute(std::move(name),
+                                   std::move(value));
+        }
+        std::optional<std::string> getAttribute(std::string_view name) override { return m_element.getAttribute(name); }
+        const std::vector<AttributePair>& getAttributes() const noexcept override { return m_element.getAttributes(); }
+        std::string getTag() const noexcept override { return m_element.getTag(); }
+
     private:
+        AbstractSimpleAutosarElement m_element;
         std::string m_text;
     };
 
