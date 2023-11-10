@@ -8,7 +8,7 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/")
 find_package(GTest REQUIRED)
 find_package(TinyXML2 REQUIRED)
 
-list(APPEND CMAKE_CXX_FLAGS "-Werror -Wpedantic")
+add_compile_options("-Wpedantic;-Werror")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
