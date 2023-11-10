@@ -2,7 +2,7 @@
 // Created by Paweł Jarosz on 09.11.2023.
 //
 
-#include <arxml/arxml_model.hpp>
+#include <arxml/model_elements.hpp>
 
 namespace arxml::model::elements {
 

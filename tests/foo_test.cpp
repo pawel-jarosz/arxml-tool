@@ -3,7 +3,7 @@
 //
 #include <gtest/gtest.h>
 
-#include <arxml/arxml_model.hpp>
+#include <arxml/model_elements.hpp>
 
 TEST(FooTest, ExampleTest) {
 }
