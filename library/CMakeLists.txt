@@ -1,1 +1,1 @@
-add_library(arxml model_elements.cpp)
+add_library(arxml model_elements_impl.cpp)

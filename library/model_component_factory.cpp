@@ -4,6 +4,8 @@
 
 #include <arxml/model_component_factory.hpp>
 
+#include "model_elements_impl.hpp"
+
 namespace arxml::model {
     std::unique_ptr<elements::IAutosarRoot> ModelComponentFactory::createRoot() const noexcept {
         std::unique_ptr<elements::IAutosarRoot> result(new elements::AutosarRoot);
