@@ -8,18 +8,206 @@
 #include <iomanip>
 
 #include <tinyxml2.h>
+#include <cassert>
 
 namespace arxml {
 
-    static void parse_model(tinyxml2::XMLElement* element, int indent = 0) {
-        std::cout << std::setw(indent) << " " << "=> " << element->Name() << std::endl;
+    class ParserLogic;
+    class ModelUnitParser;
+    class PackageParser;
+    class PackagesParser;
+    class ElementsParser;
+    class NamedElementParser;
+
+    class ParserLogic {
+    public:
+        ParserLogic(model::IModelComponentFactory& element_factory)
+        : m_element_factory{element_factory}
+        {}
+
+        virtual ~ParserLogic() = default;
+
+        model::IModelComponentFactory& getComponentFactory() { return m_element_factory; }
+
+        virtual void parse(tinyxml2::XMLElement* element) = 0;
+    private:
+        model::IModelComponentFactory& m_element_factory;
+    };
+
+    class ModelUnitParser : public ParserLogic {
+    public:
+        ModelUnitParser(model::IModelComponentFactory& element_factory, std::string filename)
+                : ParserLogic(element_factory)
+                , m_filename{std::move(filename)}
+                , m_product{nullptr} {
+
+        }
+
+        void parse(tinyxml2::XMLElement* element) override;
+        std::unique_ptr<model::elements::IModelUnit> getModelUnit() { return std::move(m_product); }
+
+    private:
+        std::string m_filename;
+        std::unique_ptr<model::elements::IModelUnit> m_product;
+    };
+
+    class PackagesParser : public ParserLogic {
+    public:
+        explicit PackagesParser(model::IModelComponentFactory& element_factory)
+                : ParserLogic(element_factory)
+        {
+
+        }
+
+        void parse(tinyxml2::XMLElement* element) override;
+        std::unique_ptr<model::elements::IAutosarPackages> getPackages() { return std::move(m_packages); }
+
+    private:
+        std::unique_ptr<model::elements::IAutosarPackages> m_packages;
+    };
+
+
+    class PackageParser : public ParserLogic {
+    public:
+        explicit PackageParser(model::IModelComponentFactory& element_factory)
+                : ParserLogic(element_factory)
+        {
+
+        }
+
+        void parse(tinyxml2::XMLElement* element) override;
+        std::unique_ptr<model::elements::IAutosarPackage> getPackage() { return std::move(m_package); }
+
+    private:
+        std::unique_ptr<model::elements::IAutosarPackage> m_package;
+    };
+
+    class ElementsParser : public ParserLogic {
+    public:
+        explicit ElementsParser(model::IModelComponentFactory& element_factory)
+                : ParserLogic(element_factory)
+        {
+
+        }
+
+        void parse(tinyxml2::XMLElement* element) override;
+        std::unique_ptr<model::elements::IAutosarElements> getElements() { return std::move(m_elements); }
+
+    private:
+        std::unique_ptr<model::elements::IAutosarElements> m_elements;
+    };
+
+    class NamedElementParser : public ParserLogic {
+    public:
+        explicit NamedElementParser(model::IModelComponentFactory& element_factory)
+                : ParserLogic(element_factory)
+        {
+
+        }
+
+        void parse(tinyxml2::XMLElement* element) override;
+        std::unique_ptr<model::elements::INamedAutosarElement> getNamedElement() { return std::move(m_element); }
+
+    private:
+        std::unique_ptr<model::elements::INamedAutosarElement> m_element;
+    };
+
+    void ModelUnitParser::parse(tinyxml2::XMLElement* element) {
+        assert(element->Name() == std::string("AR-PACKAGES"));
+        m_product = getComponentFactory().createModelUnit(m_filename);
+        auto it = element->FirstChildElement("AR-PACKAGE");
+        while (it != nullptr) {
+            PackageParser parser{getComponentFactory()};
+            m_product->addPackage(parser.getPackage());
+            it = it->NextSiblingElement();
+        }
+    }
+
+    void PackagesParser::parse(tinyxml2::XMLElement* element) {
+        m_packages = getComponentFactory().createPackages();
+        assert(element->Name() == std::string("AR-PACKAGES"));
+        auto it = element->FirstChildElement("AR-PACKAGE");
+        while (it != nullptr) {
+            PackageParser parser{getComponentFactory()};
+            m_packages->addPackage(parser.getPackage());
+            it = it->NextSiblingElement();
+        }
+    }
+
+    void PackageParser::parse(tinyxml2::XMLElement* element) {
+        assert(element->Name() == std::string("AR-PACKAGE"));
+        auto short_name = element->FirstChildElement("SHORT-NAME");
+        assert(short_name->NextSiblingElement() == nullptr);
+
+        auto packages = element->FirstChildElement("AR-PACKAGES");
+        auto elements = element->FirstChildElement("ELEMENTS");
+
+        if (packages) {
+            assert (packages->NextSiblingElement() == nullptr);
+            PackagesParser parser(getComponentFactory());
+            parser.parse(packages);
+            m_package = getComponentFactory().createPackage(short_name->GetText(), parser.getPackages());
+        }
+        else if (elements) {
+            assert (elements->NextSiblingElement() == nullptr);
+            ElementsParser parser(getComponentFactory());
+            parser.parse(elements);
+            m_package = getComponentFactory().createPackage(short_name->GetText(), parser.getElements());
+        }
+        else {
+            assert(1 == 0); // INVALID BRANCH
+        }
+    }
+
+    void ElementsParser::parse(tinyxml2::XMLElement *element) {
+        assert(element->Name() == std::string("ELEMENTS"));
+        m_elements = getComponentFactory().createElements();
+
         auto it = element->FirstChildElement();
-        while (it != 0) {
+        while (it != nullptr) {
+            NamedElementParser named_element_parser(getComponentFactory());
+            named_element_parser.parse(it);
+            m_elements->addElement(named_element_parser.getNamedElement());
+            it = it->NextSiblingElement();
+        }
+    }
+
+    void NamedElementParser::parse(tinyxml2::XMLElement* element) {
+        auto short_name = element->FirstChildElement("SHORT-NAME");
+        assert(short_name->NextSiblingElement("SHORT-NAME") == nullptr);
+        m_element = getComponentFactory().createNamedCompositeElement(element->Name(), short_name->GetText());
+
+        auto it = element->FirstChildElement();
+        while (it != nullptr) {
+            if (it->Name() == std::string("SHORT-NAME")) {
+                continue;
+            }
+            if (it->GetText() == nullptr) {
+                NamedElementParser parser(getComponentFactory());
+                parser.parse(it);
+                m_element->addSubElement(parser.getNamedElement());
+            }
+            else {
+
+            }
+            it = it->NextSiblingElement();
+        }
+    }
+
+
+    static void parse_model(tinyxml2::XMLElement* element, int indent = 0) {
+        std::cout << std::setw(indent) << " " << "=> " << element->Name();
+        if (element->GetText() != nullptr) {
+            std::cout << ": " << element->GetText();
+        }
+        std::cout << std::endl;
+        auto it = element->FirstChildElement();
+        while (it != nullptr) {
             parse_model(it, indent + 4);
             it = it->NextSiblingElement();
         }
-
     }
+
 
     void ArxmlModelBuilder::addModelUnitFromSource(const std::string& unit_name, io::IModelSource& source) {
         if (not m_root) {
@@ -28,7 +216,10 @@ namespace arxml {
         auto model_unit = m_element_factory.createModelUnit(std::string(unit_name));
         tinyxml2::XMLDocument xml;
         xml.Parse(source.getContent().c_str());
-        parse_model(xml.RootElement());
+        ModelUnitParser model_unit_parser(m_element_factory, unit_name);
+        assert(xml.RootElement()->FirstChildElement("AR-PACKAGES")->NextSiblingElement() == nullptr);
+        model_unit_parser.parse(xml.RootElement()->FirstChildElement("AR-PACKAGES"));
+        //parse_model(xml.RootElement()->FirstChildElement("AR-PACKAGES"));
         m_root->registerModelUnit(unit_name, std::move(model_unit));
     }
 
