@@ -30,6 +30,10 @@ namespace arxml::model {
         return std::unique_ptr<elements::IAutosarPackage>(new elements::AutosarPackage(std::move(name), std::move(packages)));
     }
 
+    std::unique_ptr<elements::IAutosarElements> ModelComponentFactory::createElements() const noexcept {
+        return std::unique_ptr<elements::IAutosarElements>(new elements::AutosarElements());
+    }
+
     std::unique_ptr<elements::ICompositeAutosarElement> ModelComponentFactory::createCompositeElement(std::string tag) const noexcept {
         return std::unique_ptr<elements::ICompositeAutosarElement>(new elements::CompositeAutosarElement(std::move(tag)));
     }
