@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/")
 
+find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
 find_package(GTest REQUIRED)
 find_package(Boost REQUIRED)
 find_package(TinyXML2 REQUIRED)
