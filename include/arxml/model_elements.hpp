@@ -72,6 +72,9 @@ namespace arxml::model {
     class IModelUnit : public IAutosarPackages {
     public:
         virtual std::string getModelUnitName() = 0;
+        virtual const std::string& getXmlns() const noexcept = 0;
+        virtual const std::string& getXmlnsXsi() const noexcept = 0;
+        virtual const std::string& getSchemaLocation() const noexcept = 0;
     };
 
     class IAutosarPackage : public IAutosarModelObject {
@@ -79,6 +82,8 @@ namespace arxml::model {
         [[nodiscard]] virtual const std::string& getName() const noexcept = 0;
         [[nodiscard]] EntryType getType() const noexcept override { return EntryType::PACKAGE; }
         [[nodiscard]] virtual CollectionType getCollectionType() const noexcept = 0;
+        [[nodiscard]] virtual IAutosarElements& getElements() = 0;
+        [[nodiscard]] virtual IAutosarPackages& getPackages() = 0;
     };
 
     class IAutosarElements : public IAutosarModelObject {
@@ -127,5 +132,6 @@ namespace arxml::model {
     class INamedAutosarElement : public ICompositeAutosarElement {
     public:
         [[nodiscard]] virtual std::string getName() const noexcept = 0;
+        EntryType getType() const noexcept override { return EntryType::NAMED_ELEMENT; }
     };
 }
