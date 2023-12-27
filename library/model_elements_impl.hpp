@@ -6,7 +6,7 @@
 
 #include <arxml/model_elements.hpp>
 
-namespace arxml::model::elements {
+namespace arxml::model{
 
     class AutosarRoot : public IAutosarRoot {
     public:

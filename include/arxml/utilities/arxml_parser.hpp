@@ -21,13 +21,13 @@ namespace arxml::utilities::parser {
 
         void addModelUnitFromSource(const std::string& unit_name, io::IInputSource& source);
 
-        std::unique_ptr<model::elements::IAutosarRoot> build() {
+        std::unique_ptr<model::IAutosarRoot> build() {
             return std::move(m_root);
         }
 
     private:
         IModelComponentFactory& m_element_factory;
-        std::unique_ptr<model::elements::IAutosarRoot> m_root;
+        std::unique_ptr<model::IAutosarRoot> m_root;
     };
 
 }

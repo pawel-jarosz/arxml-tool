@@ -44,11 +44,11 @@ namespace arxml::utilities::parser {
         }
 
         void parse(tinyxml2::XMLElement* element) override;
-        std::unique_ptr<model::elements::IModelUnit> getModelUnit() { return std::move(m_product); }
+        std::unique_ptr<model::IModelUnit> getModelUnit() { return std::move(m_product); }
 
     private:
         std::string m_filename;
-        std::unique_ptr<model::elements::IModelUnit> m_product;
+        std::unique_ptr<model::IModelUnit> m_product;
     };
 
     class PackagesParser : public ParserLogic {
@@ -60,10 +60,10 @@ namespace arxml::utilities::parser {
         }
 
         void parse(tinyxml2::XMLElement* element) override;
-        std::unique_ptr<model::elements::IAutosarPackages> getPackages() { return std::move(m_packages); }
+        std::unique_ptr<model::IAutosarPackages> getPackages() { return std::move(m_packages); }
 
     private:
-        std::unique_ptr<model::elements::IAutosarPackages> m_packages;
+        std::unique_ptr<model::IAutosarPackages> m_packages;
     };
 
 
@@ -76,10 +76,10 @@ namespace arxml::utilities::parser {
         }
 
         void parse(tinyxml2::XMLElement* element) override;
-        std::unique_ptr<model::elements::IAutosarPackage> getPackage() { return std::move(m_package); }
+        std::unique_ptr<model::IAutosarPackage> getPackage() { return std::move(m_package); }
 
     private:
-        std::unique_ptr<model::elements::IAutosarPackage> m_package;
+        std::unique_ptr<model::IAutosarPackage> m_package;
     };
 
     class ElementsParser : public ParserLogic {
@@ -91,10 +91,10 @@ namespace arxml::utilities::parser {
         }
 
         void parse(tinyxml2::XMLElement* element) override;
-        std::unique_ptr<model::elements::IAutosarElements> getElements() { return std::move(m_elements); }
+        std::unique_ptr<model::IAutosarElements> getElements() { return std::move(m_elements); }
 
     private:
-        std::unique_ptr<model::elements::IAutosarElements> m_elements;
+        std::unique_ptr<model::IAutosarElements> m_elements;
     };
 
     class NamedElementParser : public ParserLogic {
@@ -106,10 +106,10 @@ namespace arxml::utilities::parser {
         }
 
         void parse(tinyxml2::XMLElement* element) override;
-        std::unique_ptr<model::elements::INamedAutosarElement> getNamedElement() { return std::move(m_element); }
+        std::unique_ptr<model::INamedAutosarElement> getNamedElement() { return std::move(m_element); }
 
     private:
-        std::unique_ptr<model::elements::INamedAutosarElement> m_element;
+        std::unique_ptr<model::INamedAutosarElement> m_element;
     };
 
     void ModelUnitParser::parse(tinyxml2::XMLElement* element) {

@@ -4,7 +4,7 @@
 
 #include "model_elements_impl.hpp"
 
-namespace arxml::model::elements {
+namespace arxml::model {
 
     std::optional<std::string> AbstractSimpleAutosarElement::getAttribute(std::string_view name) {
         auto comparer = [&](const AttributePair& attribute) { return attribute.first == name; };

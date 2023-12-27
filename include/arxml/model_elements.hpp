@@ -10,7 +10,7 @@
 #include <memory>
 #include <map>
 
-namespace arxml::model::elements {
+namespace arxml::model {
 
     enum class EntryType {
         AUTOSAR,
