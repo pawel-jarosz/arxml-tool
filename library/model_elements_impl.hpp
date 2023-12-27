@@ -64,8 +64,8 @@ namespace arxml::model{
 
         [[nodiscard]] CollectionType getCollectionType() const noexcept override { return m_collection_type; }
         [[nodiscard]] const std::string& getName() const noexcept override { return m_name; }
-        IAutosarElements& getElements() { return *std::get<std::unique_ptr<IAutosarElements>>(m_elements); }
-        IAutosarPackages& getPackages() { return *std::get<std::unique_ptr<IAutosarPackages>>(m_elements); }
+        IAutosarElements& getElements() override { return *std::get<std::unique_ptr<IAutosarElements>>(m_elements); }
+        IAutosarPackages& getPackages() override { return *std::get<std::unique_ptr<IAutosarPackages>>(m_elements); }
 
     private:
         std::string m_name;
@@ -84,7 +84,7 @@ namespace arxml::model{
     class AbstractSimpleAutosarElement : public ISimpleAutosarElement {
     public:
         explicit AbstractSimpleAutosarElement(std::string tag) : m_tag{std::move(tag)} {}
-        std::string getTag() const noexcept override { return m_tag; }
+        [[nodiscard]] std::string getTag() const noexcept override { return m_tag; }
         void addAttribute(std::string name, std::string value) noexcept override { m_attributes.emplace_back(std::move(name), std::move(value)); }
         [[nodiscard]] const std::vector<AttributePair>& getAttributes() const noexcept override { return m_attributes; }
         std::optional<std::string> getAttribute(std::string_view name) override;
@@ -133,7 +133,7 @@ namespace arxml::model{
                 , m_text{std::move(text)} {}
 
         EntryType getType() const noexcept override { return EntryType::STRING_ELEMENT; }
-        const std::string& getText() { return m_text; }
+        const std::string& getText() override { return m_text; }
 
         void addAttribute(std::string name, std::string value) noexcept override {
             m_element.addAttribute(std::move(name),
@@ -171,7 +171,7 @@ namespace arxml::model{
         std::string getName() const noexcept override { return m_name; }
 
         void addSubElement(std::unique_ptr<IAutosarElement> element) noexcept override { m_composite.addSubElement(std::move(element)); }
-        std::vector<std::unique_ptr<IAutosarElement>> & getSubElements() noexcept override { return m_composite.getSubElements(); }
+        std::vector<std::unique_ptr<IAutosarElement>>& getSubElements() noexcept override { return m_composite.getSubElements(); }
         std::string getTag() const noexcept override { return m_composite.getTag(); }
     private:
         CompositeAutosarElement m_composite;
