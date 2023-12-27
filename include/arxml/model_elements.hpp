@@ -26,8 +26,8 @@ namespace arxml::model {
     };
 
     enum class CollectionType {
-        ElementsCollection,
-        PackagesCollection
+        ELEMENTS_COLLECTION,
+        PACKAGES_COLLECTION
     };
 
     class IAutosarModel;

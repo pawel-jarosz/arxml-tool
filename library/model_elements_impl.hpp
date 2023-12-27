@@ -46,11 +46,11 @@ namespace arxml::model{
     public:
         AutosarPackage(std::string name, std::unique_ptr<IAutosarElements> elements)
                 : m_name{std::move(name)}, m_elements{std::move(elements)}
-                , m_collection_type{CollectionType::ElementsCollection} {}
+                , m_collection_type{CollectionType::ELEMENTS_COLLECTION} {}
 
         AutosarPackage(std::string name, std::unique_ptr<IAutosarPackages> packages)
                 : m_name{std::move(name)}, m_elements{std::move(packages)}
-                , m_collection_type{CollectionType::PackagesCollection} {}
+                , m_collection_type{CollectionType::PACKAGES_COLLECTION} {}
 
         [[nodiscard]] CollectionType getCollectionType() const noexcept override { return m_collection_type; }
         [[nodiscard]] const std::string& getName() const noexcept override { return m_name; }
