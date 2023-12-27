@@ -13,7 +13,7 @@ namespace arxml::utilities::parser {
     }
 
     std::unique_ptr<model::IModelEntry> ModelComponentFactory::createModelUnit(std::string unit_name) const noexcept {
-        return std::unique_ptr<model::IModelEntry>(new model::AutosarModelUnit(unit_name));
+        return std::unique_ptr<model::IModelEntry>(new model::AutosarModelEntry(unit_name, "", "", ""));
     }
 
     std::unique_ptr<model::IAutosarPackages> ModelComponentFactory::createPackages() const noexcept {

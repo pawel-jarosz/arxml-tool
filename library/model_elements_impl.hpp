@@ -25,20 +25,30 @@ namespace arxml::model{
         PackagePtrContainer m_container;
     };
 
-    class AutosarModelUnit : virtual public IModelEntry {
+    class AutosarModelEntry : virtual public IModelEntry {
     public:
-        explicit AutosarModelUnit(std::string source)
+        explicit AutosarModelEntry(std::string source, std::string xmlns, std::string xmlns_xsi,
+                                   std::string xmlns_schema_location)
                 : m_source{std::move(source)}
+                , m_xmlns{std::move(xmlns)}
+                , m_xmlns_xsi{std::move(xmlns_xsi)}
+                , m_xmlns_schema_location{std::move(xmlns_schema_location)}
                 , m_packages{} {
         }
 
-        std::string getModelUnitName() override { return m_source; }
+        std::string getEntryName() override { return m_source; }
+        const std::string& getXmlns() const noexcept override { return m_xmlns; }
+        const std::string& getXmlnsXsi() const noexcept override { return m_xmlns_xsi; }
+        const std::string& getSchemaLocation() const noexcept override { return m_xmlns_schema_location; }
 
         PackagePtrContainer& getPackages() noexcept override { return m_packages.getPackages(); }
         void addPackage(PackagePtr package) noexcept override { m_packages.addPackage(std::move(package)); }
 
     private:
         std::string m_source;
+        std::string m_xmlns;
+        std::string m_xmlns_xsi;
+        std::string m_xmlns_schema_location;
         AutosarPackages m_packages;
     };
 

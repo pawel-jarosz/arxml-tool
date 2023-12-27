@@ -71,10 +71,10 @@ namespace arxml::model {
 
     class IModelEntry : public IAutosarPackages {
     public:
-        virtual std::string getModelUnitName() = 0;
-        virtual const std::string& getXmlns() const noexcept = 0;
-        virtual const std::string& getXmlnsXsi() const noexcept = 0;
-        virtual const std::string& getSchemaLocation() const noexcept = 0;
+        virtual std::string getEntryName() = 0;
+        [[nodiscard]] virtual const std::string& getXmlns() const noexcept = 0;
+        [[nodiscard]] virtual const std::string& getXmlnsXsi() const noexcept = 0;
+        [[nodiscard]] virtual const std::string& getSchemaLocation() const noexcept = 0;
     };
 
     class IAutosarPackage : public IAutosarModelObject {
