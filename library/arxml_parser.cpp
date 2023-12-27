@@ -4,20 +4,55 @@
 
 #include "arxml/utilities/arxml_parser.hpp"
 
-#include <iostream>
-#include <iomanip>
+#include <cassert>
+
+#include <boost/lexical_cast.hpp>
 
 #include <tinyxml2.h>
-#include <cassert>
 
 namespace arxml::utilities::parser {
 
+    namespace {
+        enum class ValueType {
+            FLOATING,
+            INTEGER,
+            STRING
+        };
+
+        struct ParsedValue {
+            ValueType type;
+            std::variant<double, int, std::string> value;
+
+            explicit ParsedValue(double value) : type{ValueType::FLOATING}, value{value} {}
+            explicit ParsedValue(int value) : type{ValueType::INTEGER}, value{value} {}
+            explicit ParsedValue(std::string value) : type{ValueType::STRING}, value{std::move(value)} {}
+        };
+
+        static ParsedValue parseElementValue(std::string value) {
+            try {
+                auto double_value = boost::lexical_cast<double>(value);
+                auto integer_value = boost::lexical_cast<int>(value);
+                if (double_value == static_cast<double>(integer_value)) {
+                    return ParsedValue(integer_value);
+                }
+                else {
+                    return ParsedValue{double_value};
+                }
+            }
+            catch (const boost::bad_lexical_cast& e) {
+                return ParsedValue(std::move(value));
+            }
+        }
+    }
+
     class ParserLogic;
-    class ModelUnitParser;
+    class ModelEntryParser;
     class PackageParser;
     class PackagesParser;
     class ElementsParser;
     class NamedElementParser;
+    class CompositeElementParser;
+    class SimpleElementParser;
 
     class ParserLogic {
     public:
@@ -34,11 +69,15 @@ namespace arxml::utilities::parser {
         IModelComponentFactory& m_element_factory;
     };
 
-    class ModelUnitParser : public ParserLogic {
+    class ModelEntryParser : public ParserLogic {
     public:
-        ModelUnitParser(IModelComponentFactory& element_factory, std::string filename)
+        ModelEntryParser(IModelComponentFactory& element_factory, std::string filename, std::string xmlns,
+                         std::string xmlns_xsi, std::string xmlns_schema_location)
                 : ParserLogic(element_factory)
                 , m_filename{std::move(filename)}
+                , m_xmlns{std::move(xmlns)}
+                , m_xmlns_xsi{std::move(xmlns_xsi)}
+                , m_xmlns_schema_location{std::move(xmlns_schema_location)}
                 , m_product{nullptr} {
 
         }
@@ -48,6 +87,9 @@ namespace arxml::utilities::parser {
 
     private:
         std::string m_filename;
+        std::string m_xmlns;
+        std::string m_xmlns_xsi;
+        std::string m_xmlns_schema_location;
         std::unique_ptr<model::IModelEntry> m_product;
     };
 
@@ -112,13 +154,46 @@ namespace arxml::utilities::parser {
         std::unique_ptr<model::INamedAutosarElement> m_element;
     };
 
-    void ModelUnitParser::parse(tinyxml2::XMLElement* element) {
+    class CompositeElementParser : public ParserLogic {
+    public:
+        explicit CompositeElementParser(IModelComponentFactory& element_factory)
+                : ParserLogic(element_factory)
+        {
+
+        }
+
+        void parse(tinyxml2::XMLElement* element) override;
+        std::unique_ptr<model::ICompositeAutosarElement> getCompositeElement() { return std::move(m_element); }
+
+    private:
+        std::unique_ptr<model::ICompositeAutosarElement> m_element;
+    };
+
+    class SimpleElementParser : public ParserLogic {
+    public:
+        explicit SimpleElementParser(IModelComponentFactory& element_factory)
+                : ParserLogic(element_factory)
+        {
+
+        }
+
+        void parse(tinyxml2::XMLElement* element) override;
+        std::unique_ptr<model::ISimpleAutosarElement> getSimpleElement() { return std::move(m_element); }
+
+    private:
+        std::unique_ptr<model::ISimpleAutosarElement> m_element;
+    };
+
+    void ModelEntryParser::parse(tinyxml2::XMLElement* element) {
         assert(element->Name() == std::string("AR-PACKAGES"));
-        m_product = getComponentFactory().createModelUnit(m_filename);
+        m_product = getComponentFactory().createModelEntry(m_filename, m_xmlns, m_xmlns_xsi, m_xmlns_schema_location);
         auto it = element->FirstChildElement("AR-PACKAGE");
         while (it != nullptr) {
             PackageParser parser{getComponentFactory()};
-            m_product->addPackage(parser.getPackage());
+            parser.parse(it);
+            auto result = parser.getPackage();
+            assert(result != nullptr);
+            m_product->addPackage(std::move(result));
             it = it->NextSiblingElement();
         }
     }
@@ -129,6 +204,7 @@ namespace arxml::utilities::parser {
         auto it = element->FirstChildElement("AR-PACKAGE");
         while (it != nullptr) {
             PackageParser parser{getComponentFactory()};
+            parser.parse(it);
             m_packages->addPackage(parser.getPackage());
             it = it->NextSiblingElement();
         }
@@ -137,7 +213,7 @@ namespace arxml::utilities::parser {
     void PackageParser::parse(tinyxml2::XMLElement* element) {
         assert(element->Name() == std::string("AR-PACKAGE"));
         auto short_name = element->FirstChildElement("SHORT-NAME");
-        assert(short_name->NextSiblingElement() == nullptr);
+        assert(short_name->NextSiblingElement("SHORT-NAME") == nullptr);
 
         auto packages = element->FirstChildElement("AR-PACKAGES");
         auto elements = element->FirstChildElement("ELEMENTS");
@@ -174,53 +250,106 @@ namespace arxml::utilities::parser {
 
     void NamedElementParser::parse(tinyxml2::XMLElement* element) {
         auto short_name = element->FirstChildElement("SHORT-NAME");
+
         assert(short_name->NextSiblingElement("SHORT-NAME") == nullptr);
+
         m_element = getComponentFactory().createNamedCompositeElement(element->Name(), short_name->GetText());
 
         auto it = element->FirstChildElement();
         while (it != nullptr) {
             if (it->Name() == std::string("SHORT-NAME")) {
+                it = it->NextSiblingElement();
                 continue;
             }
-            if (it->GetText() == nullptr) {
+            if (not it->GetText() and it->FirstChildElement("SHORT-NAME")) {
                 NamedElementParser parser(getComponentFactory());
                 parser.parse(it);
                 m_element->addSubElement(parser.getNamedElement());
             }
+            else if (not it->GetText()) {
+                CompositeElementParser parser(getComponentFactory());
+                parser.parse(it);
+                m_element->addSubElement(parser.getCompositeElement());
+            }
             else {
-
+                SimpleElementParser parser(getComponentFactory());
+                parser.parse(it);
+                m_element->addSubElement(parser.getSimpleElement());
             }
             it = it->NextSiblingElement();
         }
     }
 
+    void CompositeElementParser::parse(tinyxml2::XMLElement* element) {
+        m_element = getComponentFactory().createCompositeElement(element->Name());
 
-    static void parse_model(tinyxml2::XMLElement* element, int indent = 0) {
-        std::cout << std::setw(indent) << " " << "=> " << element->Name();
-        if (element->GetText() != nullptr) {
-            std::cout << ": " << element->GetText();
-        }
-        std::cout << std::endl;
         auto it = element->FirstChildElement();
         while (it != nullptr) {
-            parse_model(it, indent + 4);
+            if (not it->GetText() and it->FirstChildElement("SHORT-NAME")) {
+                NamedElementParser parser(getComponentFactory());
+                parser.parse(it);
+                m_element->addSubElement(parser.getNamedElement());
+            }
+            else if (not it->GetText()) {
+                CompositeElementParser parser(getComponentFactory());
+                parser.parse(it);
+                m_element->addSubElement(parser.getCompositeElement());
+            }
+            else {
+                SimpleElementParser parser(getComponentFactory());
+                parser.parse(it);
+                m_element->addSubElement(parser.getSimpleElement());
+            }
             it = it->NextSiblingElement();
         }
     }
 
+    void SimpleElementParser::parse(tinyxml2::XMLElement* element) {
+        auto tag_name = element->Name();
+        std::string value{element->GetText()};
 
-    void ArxmlModelBuilder::addModelUnitFromSource(const std::string& unit_name, utilities::io::IInputSource& source) {
+        auto parsing_value = parseElementValue(value);
+        switch(parsing_value.type) {
+            case ValueType::FLOATING: {
+                m_element = getComponentFactory().createNumberElement(tag_name, std::get<double>(parsing_value.value));
+                break;
+            }
+            case ValueType::INTEGER: {
+                m_element = getComponentFactory().createNumberElement(tag_name, std::get<int>(parsing_value.value));
+                break;
+            }
+            default:
+                m_element = getComponentFactory().createStringElement(tag_name, std::move(value));
+        }
+        auto attribute_it = element->FirstAttribute();
+        while(attribute_it != nullptr) {
+            m_element->addAttribute(attribute_it->Name(), attribute_it->Value());
+            attribute_it = attribute_it->Next();
+        }
+    }
+
+
+    void ArxmlModelBuilder::addEntryFromSource(const std::string& unit_name, utilities::io::IInputSource& source) {
         if (not m_root) {
             m_root = std::move(m_element_factory.createRoot());
         }
-        auto model_unit = m_element_factory.createModelUnit(std::string(unit_name));
+
         tinyxml2::XMLDocument xml;
         xml.Parse(source.getContent().c_str());
-        ModelUnitParser model_unit_parser(m_element_factory, unit_name);
+
+        // TODO: Check if all attributes are available
+        assert(xml.RootElement()->Attribute("xmlns") != nullptr
+               and xml.RootElement()->Attribute("xmlns:xsi") != nullptr
+               and xml.RootElement()->Attribute("xsi:schemaLocation") != nullptr);
+
+        ModelEntryParser model_unit_parser(m_element_factory, unit_name, xml.RootElement()->Attribute("xmlns"),
+                                          xml.RootElement()->Attribute("xmlns:xsi"),
+                                          xml.RootElement()->Attribute("xsi:schemaLocation"));
+        assert(xml.RootElement() != nullptr);
+        assert(xml.RootElement()->FirstChildElement("AR-PACKAGES") != nullptr);
         assert(xml.RootElement()->FirstChildElement("AR-PACKAGES")->NextSiblingElement() == nullptr);
         model_unit_parser.parse(xml.RootElement()->FirstChildElement("AR-PACKAGES"));
-        //parse_model(xml.RootElement()->FirstChildElement("AR-PACKAGES"));
-        m_root->registerModelEntry(unit_name, std::move(model_unit));
+        m_root->registerModelEntry(unit_name, std::move(model_unit_parser.getModelUnit()));
     }
 
 }

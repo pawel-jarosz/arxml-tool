@@ -19,7 +19,7 @@ namespace arxml::utilities::parser {
 
         }
 
-        void addModelUnitFromSource(const std::string& unit_name, io::IInputSource& source);
+        void addEntryFromSource(const std::string& unit_name, utilities::io::IInputSource &source);
 
         std::unique_ptr<model::IAutosarModel> build() {
             return std::move(m_root);
