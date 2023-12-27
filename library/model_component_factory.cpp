@@ -7,8 +7,8 @@
 #include "model_elements_impl.hpp"
 
 namespace arxml::utilities::parser {
-    std::unique_ptr<model::IAutosarRoot> ModelComponentFactory::createRoot() const noexcept {
-        std::unique_ptr<model::IAutosarRoot> result(new model::AutosarRoot);
+    std::unique_ptr<model::IAutosarModel> ModelComponentFactory::createRoot() const noexcept {
+        std::unique_ptr<model::IAutosarModel> result(new model::AutosarRoot);
         return result;
     }
 

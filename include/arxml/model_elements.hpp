@@ -30,7 +30,7 @@ namespace arxml::model {
         PACKAGES_COLLECTION
     };
 
-    class IAutosarModel;
+    class IAutosarModelObject;
     class IModelUnit;
     class IAutosarPackages;
     class IAutosarPackage;
@@ -42,13 +42,13 @@ namespace arxml::model {
     class IStringAutosarElement;
     class INumberAutosarElement;
 
-    class IAutosarModel {
+    class IAutosarModelObject {
     public:
-        virtual ~IAutosarModel() = default;
+        virtual ~IAutosarModelObject() = default;
         [[nodiscard]] virtual EntryType getType() const noexcept = 0;
     };
 
-    class IAutosarRoot : public IAutosarModel {
+    class IAutosarModel : public IAutosarModelObject {
     public:
         using ModelUnitMap = std::map<std::string, std::unique_ptr<IModelUnit>>;
 
@@ -58,7 +58,7 @@ namespace arxml::model {
         [[nodiscard]] virtual ModelUnitMap& getModelUnits() noexcept = 0;
     };
 
-    class IAutosarPackages : public IAutosarModel {
+    class IAutosarPackages : public IAutosarModelObject {
     public:
         using PackagePtr = std::unique_ptr<IAutosarPackage>;
         using PackagePtrContainer = std::vector<PackagePtr>;
@@ -74,21 +74,21 @@ namespace arxml::model {
         virtual std::string getModelUnitName() = 0;
     };
 
-    class IAutosarPackage : public IAutosarModel {
+    class IAutosarPackage : public IAutosarModelObject {
     public:
         [[nodiscard]] virtual const std::string& getName() const noexcept = 0;
         [[nodiscard]] EntryType getType() const noexcept override { return EntryType::PACKAGE; }
         [[nodiscard]] virtual CollectionType getCollectionType() const noexcept = 0;
     };
 
-    class IAutosarElements : public IAutosarModel {
+    class IAutosarElements : public IAutosarModelObject {
     public:
         [[nodiscard]] EntryType getType() const noexcept override { return EntryType::ELEMENTS; }
         virtual std::vector<std::unique_ptr<INamedAutosarElement>>& getElements() noexcept = 0;
         virtual void addElement(std::unique_ptr<INamedAutosarElement> element) noexcept = 0;
     };
 
-    class IAutosarElement : public IAutosarModel {
+    class IAutosarElement : public IAutosarModelObject {
     public:
         [[nodiscard]] virtual std::string getTag() const noexcept = 0;
         [[nodiscard]] virtual bool isComposite() const noexcept { return false; }

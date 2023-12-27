@@ -8,7 +8,7 @@
 
 namespace arxml::model{
 
-    class AutosarRoot : public IAutosarRoot {
+    class AutosarRoot : public IAutosarModel {
     public:
         void registerModelUnit(const std::string& entry_name, std::unique_ptr<IModelUnit> package) override { m_packages[entry_name] = std::move(package);}
         IModelUnit& getModelUnitByName(const std::string& entry_name) override { return *m_packages.at(entry_name); }
