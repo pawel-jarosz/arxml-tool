@@ -31,7 +31,7 @@ namespace arxml::model {
     };
 
     class IAutosarModelObject;
-    class IModelUnit;
+    class IModelEntry;
     class IAutosarPackages;
     class IAutosarPackage;
     class IAutosarElements;
@@ -50,11 +50,11 @@ namespace arxml::model {
 
     class IAutosarModel : public IAutosarModelObject {
     public:
-        using ModelUnitMap = std::map<std::string, std::unique_ptr<IModelUnit>>;
+        using ModelUnitMap = std::map<std::string, std::unique_ptr<IModelEntry>>;
 
         [[nodiscard]] EntryType getType() const noexcept override { return EntryType::AUTOSAR; }
-        virtual IModelUnit& getModelUnitByName(const std::string& entry_name) = 0;
-        virtual void registerModelUnit(const std::string& entry_name, std::unique_ptr<IModelUnit> package) = 0;
+        virtual IModelEntry& getModelEntry(const std::string& entry_name) = 0;
+        virtual void registerModelEntry(const std::string& entry_name, std::unique_ptr<IModelEntry> package) = 0;
         [[nodiscard]] virtual ModelUnitMap& getModelUnits() noexcept = 0;
     };
 
@@ -69,7 +69,7 @@ namespace arxml::model {
         virtual void addPackage(PackagePtr package) noexcept = 0;
     };
 
-    class IModelUnit : public IAutosarPackages {
+    class IModelEntry : public IAutosarPackages {
     public:
         virtual std::string getModelUnitName() = 0;
         virtual const std::string& getXmlns() const noexcept = 0;

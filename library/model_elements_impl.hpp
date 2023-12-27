@@ -8,10 +8,10 @@
 
 namespace arxml::model{
 
-    class AutosarRoot : public IAutosarModel {
+    class AutosarModel : public IAutosarModel {
     public:
-        void registerModelUnit(const std::string& entry_name, std::unique_ptr<IModelUnit> package) override { m_packages[entry_name] = std::move(package);}
-        IModelUnit& getModelUnitByName(const std::string& entry_name) override { return *m_packages.at(entry_name); }
+        void registerModelEntry(const std::string& entry_name, std::unique_ptr<IModelEntry> package) override { m_packages[entry_name] = std::move(package);}
+        IModelEntry& getModelEntry(const std::string& entry_name) override { return *m_packages.at(entry_name); }
         [[nodiscard]] ModelUnitMap& getModelUnits() noexcept override { return m_packages; }
     private:
         ModelUnitMap m_packages;
@@ -25,7 +25,7 @@ namespace arxml::model{
         PackagePtrContainer m_container;
     };
 
-    class AutosarModelUnit : virtual public IModelUnit {
+    class AutosarModelUnit : virtual public IModelEntry {
     public:
         explicit AutosarModelUnit(std::string source)
                 : m_source{std::move(source)}

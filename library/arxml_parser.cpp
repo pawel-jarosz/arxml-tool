@@ -44,11 +44,11 @@ namespace arxml::utilities::parser {
         }
 
         void parse(tinyxml2::XMLElement* element) override;
-        std::unique_ptr<model::IModelUnit> getModelUnit() { return std::move(m_product); }
+        std::unique_ptr<model::IModelEntry> getModelUnit() { return std::move(m_product); }
 
     private:
         std::string m_filename;
-        std::unique_ptr<model::IModelUnit> m_product;
+        std::unique_ptr<model::IModelEntry> m_product;
     };
 
     class PackagesParser : public ParserLogic {
@@ -220,7 +220,7 @@ namespace arxml::utilities::parser {
         assert(xml.RootElement()->FirstChildElement("AR-PACKAGES")->NextSiblingElement() == nullptr);
         model_unit_parser.parse(xml.RootElement()->FirstChildElement("AR-PACKAGES"));
         //parse_model(xml.RootElement()->FirstChildElement("AR-PACKAGES"));
-        m_root->registerModelUnit(unit_name, std::move(model_unit));
+        m_root->registerModelEntry(unit_name, std::move(model_unit));
     }
 
 }
