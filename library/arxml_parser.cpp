@@ -2,7 +2,7 @@
 // Created by Paweł Jarosz on 10.11.2023.
 //
 
-#include <arxml/arxml_parser.hpp>
+#include "arxml/utilities/arxml_parser.hpp"
 
 #include <iostream>
 #include <iomanip>
@@ -10,7 +10,7 @@
 #include <tinyxml2.h>
 #include <cassert>
 
-namespace arxml {
+namespace arxml::utilities::parser {
 
     class ParserLogic;
     class ModelUnitParser;
@@ -21,22 +21,22 @@ namespace arxml {
 
     class ParserLogic {
     public:
-        ParserLogic(model::IModelComponentFactory& element_factory)
+        explicit ParserLogic(IModelComponentFactory& element_factory)
         : m_element_factory{element_factory}
         {}
 
         virtual ~ParserLogic() = default;
 
-        model::IModelComponentFactory& getComponentFactory() { return m_element_factory; }
+        IModelComponentFactory& getComponentFactory() { return m_element_factory; }
 
         virtual void parse(tinyxml2::XMLElement* element) = 0;
     private:
-        model::IModelComponentFactory& m_element_factory;
+        IModelComponentFactory& m_element_factory;
     };
 
     class ModelUnitParser : public ParserLogic {
     public:
-        ModelUnitParser(model::IModelComponentFactory& element_factory, std::string filename)
+        ModelUnitParser(IModelComponentFactory& element_factory, std::string filename)
                 : ParserLogic(element_factory)
                 , m_filename{std::move(filename)}
                 , m_product{nullptr} {
@@ -53,7 +53,7 @@ namespace arxml {
 
     class PackagesParser : public ParserLogic {
     public:
-        explicit PackagesParser(model::IModelComponentFactory& element_factory)
+        explicit PackagesParser(IModelComponentFactory& element_factory)
                 : ParserLogic(element_factory)
         {
 
@@ -69,7 +69,7 @@ namespace arxml {
 
     class PackageParser : public ParserLogic {
     public:
-        explicit PackageParser(model::IModelComponentFactory& element_factory)
+        explicit PackageParser(IModelComponentFactory& element_factory)
                 : ParserLogic(element_factory)
         {
 
@@ -84,7 +84,7 @@ namespace arxml {
 
     class ElementsParser : public ParserLogic {
     public:
-        explicit ElementsParser(model::IModelComponentFactory& element_factory)
+        explicit ElementsParser(IModelComponentFactory& element_factory)
                 : ParserLogic(element_factory)
         {
 
@@ -99,7 +99,7 @@ namespace arxml {
 
     class NamedElementParser : public ParserLogic {
     public:
-        explicit NamedElementParser(model::IModelComponentFactory& element_factory)
+        explicit NamedElementParser(IModelComponentFactory& element_factory)
                 : ParserLogic(element_factory)
         {
 
@@ -209,7 +209,7 @@ namespace arxml {
     }
 
 
-    void ArxmlModelBuilder::addModelUnitFromSource(const std::string& unit_name, utilities::IInputSource& source) {
+    void ArxmlModelBuilder::addModelUnitFromSource(const std::string& unit_name, utilities::io::IInputSource& source) {
         if (not m_root) {
             m_root = std::move(m_element_factory.createRoot());
         }

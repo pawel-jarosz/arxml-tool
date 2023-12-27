@@ -4,29 +4,29 @@
 
 #pragma once
 
-#include <arxml/model_component_factory.hpp>
-#include <arxml/model_elements.hpp>
+#include "model_component_factory.hpp"
+#include "arxml/model_elements.hpp"
 #include "arxml/utilities/input_source.hpp"
 
-namespace arxml {
+namespace arxml::utilities::parser {
 
     class ArxmlModelBuilder {
     public:
-        explicit ArxmlModelBuilder(model::IModelComponentFactory& element_factory)
+        explicit ArxmlModelBuilder(IModelComponentFactory& element_factory)
         : m_element_factory{element_factory}
         , m_root{}
         {
 
         }
 
-        void addModelUnitFromSource(const std::string& unit_name, utilities::IInputSource& source);
+        void addModelUnitFromSource(const std::string& unit_name, io::IInputSource& source);
 
         std::unique_ptr<model::elements::IAutosarRoot> build() {
             return std::move(m_root);
         }
 
     private:
-        model::IModelComponentFactory& m_element_factory;
+        IModelComponentFactory& m_element_factory;
         std::unique_ptr<model::elements::IAutosarRoot> m_root;
     };
 
