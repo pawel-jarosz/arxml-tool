@@ -209,7 +209,7 @@ namespace arxml {
     }
 
 
-    void ArxmlModelBuilder::addModelUnitFromSource(const std::string& unit_name, io::IModelSource& source) {
+    void ArxmlModelBuilder::addModelUnitFromSource(const std::string& unit_name, utilities::IInputSource& source) {
         if (not m_root) {
             m_root = std::move(m_element_factory.createRoot());
         }

@@ -6,7 +6,7 @@
 
 #include <arxml/model_component_factory.hpp>
 #include <arxml/model_elements.hpp>
-#include <arxml/model_source.hpp>
+#include "arxml/utilities/input_source.hpp"
 
 namespace arxml {
 
@@ -19,7 +19,7 @@ namespace arxml {
 
         }
 
-        void addModelUnitFromSource(const std::string& unit_name, io::IModelSource& source);
+        void addModelUnitFromSource(const std::string& unit_name, utilities::IInputSource& source);
 
         std::unique_ptr<model::elements::IAutosarRoot> build() {
             return std::move(m_root);

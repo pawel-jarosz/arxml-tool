@@ -7,16 +7,16 @@
 #include <fstream>
 #include <string>
 
-namespace arxml::io {
+namespace arxml::utilities::io {
 
-    class IModelSource {
+    class IInputSource {
     public:
         virtual std::string getContent() = 0;
         virtual bool open(std::string_view input) = 0;
         virtual bool isOpened() = 0;
     };
 
-    class FileSource : public IModelSource {
+    class FileSource : public IInputSource {
     public:
         explicit FileSource(std::string filename)
         : m_input(std::move(filename))
@@ -40,7 +40,7 @@ namespace arxml::io {
         bool m_opened;
     };
 
-    class StringSource : public IModelSource {
+    class StringSource : public IInputSource {
     public:
         explicit StringSource(std::string content)
         : m_content{std::move(content)}
