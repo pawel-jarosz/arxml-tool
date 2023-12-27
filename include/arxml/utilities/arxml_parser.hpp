@@ -5,7 +5,7 @@
 #pragma once
 
 #include "model_component_factory.hpp"
-#include "arxml/model_elements.hpp"
+#include "arxml/elements.hpp"
 #include "arxml/utilities/input_source.hpp"
 
 namespace arxml::utilities::parser {
