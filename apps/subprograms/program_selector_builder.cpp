@@ -4,8 +4,12 @@
 
 #include "arxml_tool/program_selector_builder.hpp"
 
+#include "dump_tree_subprogram.hpp"
+
 namespace arxml_tool {
 
-    Program
+    void ProgramSelectorBuilder::build() {
+        m_selector.registerSubProgram(std::unique_ptr<AbstractSubProgram>(new DumpTreeSubprogram));
+    }
 
 }

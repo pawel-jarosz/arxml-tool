@@ -23,6 +23,10 @@ namespace arxml_tool {
             });
             return EXIT_FAILURE;
         }
+        std::vector<std::string> subcommands(++m_argv.begin(), m_argv.end());
+        std::for_each(m_subprograms.begin(), m_subprograms.end(), [&](std::unique_ptr<AbstractSubProgram>& program) {
+           program->execute(subcommands);
+        });
         return EXIT_SUCCESS;
     }
 

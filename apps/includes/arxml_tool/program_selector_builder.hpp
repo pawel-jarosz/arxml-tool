@@ -10,8 +10,13 @@ namespace arxml_tool {
 
     class ProgramSelectorBuilder {
     public:
-        explicit ProgramSelectorBuilder();
+        explicit ProgramSelectorBuilder(ProgramSelector& selector)
+        : m_selector{selector}
+        {}
+
         void build();
+    private:
+        ProgramSelector& m_selector;
     };
 
 }
