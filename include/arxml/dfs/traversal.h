@@ -9,11 +9,11 @@
 
 namespace arxml::dfs {
 
-    void traverse_model(model::IAutosarModel& root, TraverseModelCallback& callback);
-    void traverse_model(model::IAutosarPackages& model_unit, TraverseModelCallback& callback);
-    void traverse_model(model::IAutosarPackage& element, TraverseModelCallback& callback);
-    void traverse_model(model::IModelEntry& model_unit, TraverseModelCallback& callback);
-    void traverse_model(model::IAutosarElements& model_unit, TraverseModelCallback& callback);
-    void traverse_model(model::IAutosarElement& element, TraverseModelCallback& callback);
+    void traverse_model(model::IAutosarModel& root, TraversalCallback& callback);
+    void traverse_model(model::IAutosarPackages& model_unit, TraversalCallback& callback);
+    void traverse_model(model::IAutosarPackage& element, TraversalCallback& callback);
+    void traverse_model(model::IModelEntry& model_unit, TraversalCallback& callback);
+    void traverse_model(model::IAutosarElements& model_unit, TraversalCallback& callback);
+    void traverse_model(model::IAutosarElement& element, TraversalCallback& callback);
 
 }

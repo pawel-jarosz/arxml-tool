@@ -8,9 +8,9 @@
 
 namespace arxml::dfs {
 
-    class TraverseModelCallback {
+    class TraversalCallback {
     public:
-        virtual ~TraverseModelCallback() = default;
+        virtual ~TraversalCallback() = default;
         virtual void visit(model::IAutosarModel& root) {}
         virtual void visit(model::IModelEntry& root) {}
         virtual void visit(model::IAutosarPackages& packages) {}
@@ -25,4 +25,5 @@ namespace arxml::dfs {
         virtual void close(model::IAutosarElements& elements) {}
         virtual void close(model::IAutosarElement& element) {}
     };
+
 }

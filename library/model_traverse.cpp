@@ -7,7 +7,7 @@
 namespace arxml::dfs {
     class ElementTraversalStrategy {
     public:
-        explicit ElementTraversalStrategy(TraverseModelCallback& callback)
+        explicit ElementTraversalStrategy(TraversalCallback& callback)
                 : m_callback{callback}
         {
 
@@ -20,7 +20,7 @@ namespace arxml::dfs {
         void traverse_model(model::IAutosarElements& elements);
         void traverse_model(model::IAutosarElement& element);
     private:
-        TraverseModelCallback& m_callback;
+        TraversalCallback& m_callback;
     };
 
     void ElementTraversalStrategy::traverse_model(model::IAutosarModel& root) {
@@ -89,32 +89,32 @@ namespace arxml::dfs {
 
 
     template<class ModelElement>
-    void traverse_model_tree(ModelElement& element, TraverseModelCallback& callback) {
+    void traverse_model_tree(ModelElement& element, TraversalCallback& callback) {
         ElementTraversalStrategy traversal_strategy{callback};
         traversal_strategy.traverse_model(element);
     }
 
-    void traverse_model(model::IAutosarModel& root, TraverseModelCallback& callback) {
+    void traverse_model(model::IAutosarModel& root, TraversalCallback& callback) {
         traverse_model_tree(root, callback);
     }
 
-    void traverse_model(model::IModelEntry& model_unit, TraverseModelCallback& callback) {
+    void traverse_model(model::IModelEntry& model_unit, TraversalCallback& callback) {
         traverse_model_tree(model_unit, callback);
     }
 
-    void traverse_model(model::IAutosarPackages& packages, TraverseModelCallback& callback) {
+    void traverse_model(model::IAutosarPackages& packages, TraversalCallback& callback) {
         traverse_model_tree(packages, callback);
     }
 
-    void traverse_model(model::IAutosarPackage& package, TraverseModelCallback& callback) {
+    void traverse_model(model::IAutosarPackage& package, TraversalCallback& callback) {
         traverse_model_tree(package, callback);
     }
 
-    void traverse_model(model::IAutosarElements& elements, TraverseModelCallback& callback) {
+    void traverse_model(model::IAutosarElements& elements, TraversalCallback& callback) {
         traverse_model_tree(elements, callback);
     }
 
-    void traverse_model(model::IAutosarElement& element, TraverseModelCallback& callback) {
+    void traverse_model(model::IAutosarElement& element, TraversalCallback& callback) {
         traverse_model_tree(element, callback);
     }
 }
