@@ -12,8 +12,8 @@ namespace arxml::utilities::parser {
         return result;
     }
 
-    std::unique_ptr<model::IModelEntry> ModelComponentFactory::createModelUnit(std::string unit_name) const noexcept {
-        return std::unique_ptr<model::IModelEntry>(new model::AutosarModelEntry(unit_name, "", "", ""));
+    std::unique_ptr<model::IModelEntry> ModelComponentFactory::createModelUnit(std::string unit_name, std::string xmlns, std::string xmlns_xsi, std::string xmlns_schema_location) const noexcept {
+        return std::unique_ptr<model::IModelEntry>(new model::AutosarModelEntry(std::move(unit_name), std::move(xmlns), std::move(xmlns_xsi), std::move(xmlns_schema_location)));
     }
 
     std::unique_ptr<model::IAutosarPackages> ModelComponentFactory::createPackages() const noexcept {

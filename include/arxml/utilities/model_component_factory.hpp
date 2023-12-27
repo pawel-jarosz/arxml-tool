@@ -12,7 +12,7 @@ namespace arxml::utilities::parser {
     public:
         ~IModelComponentFactory() = default;
         virtual std::unique_ptr<model::IAutosarModel> createRoot() const noexcept = 0;
-        virtual std::unique_ptr<model::IModelEntry> createModelUnit(std::string unit_name) const noexcept = 0;
+        virtual std::unique_ptr<model::IModelEntry> createModelUnit(std::string unit_name, std::string xmlns, std::string xmlns_xsi, std::string xmlns_schema_location) const noexcept = 0;
         virtual std::unique_ptr<model::IAutosarPackages> createPackages() const noexcept = 0;
         virtual std::unique_ptr<model::IAutosarPackage> createPackage(std::string name, std::unique_ptr<model::IAutosarElements> elements) const noexcept = 0;
         virtual std::unique_ptr<model::IAutosarPackage> createPackage(std::string name, std::unique_ptr<model::IAutosarPackages> packages) const noexcept = 0;
@@ -27,7 +27,7 @@ namespace arxml::utilities::parser {
     class ModelComponentFactory : public IModelComponentFactory {
     public:
         [[nodiscard]] std::unique_ptr<model::IAutosarModel> createRoot() const noexcept override;
-        [[nodiscard]] std::unique_ptr<model::IModelEntry> createModelUnit(std::string unit_name) const noexcept override;
+        [[nodiscard]] std::unique_ptr<model::IModelEntry> createModelUnit(std::string unit_name, std::string xmlns, std::string xmlns_xsi, std::string xmlns_schema_location) const noexcept override;
         [[nodiscard]] std::unique_ptr<model::IAutosarPackages> createPackages() const noexcept override;
         [[nodiscard]] std::unique_ptr<model::IAutosarPackage> createPackage(std::string name, std::unique_ptr<model::IAutosarElements> elements) const noexcept override;
         [[nodiscard]] std::unique_ptr<model::IAutosarPackage> createPackage(std::string name, std::unique_ptr<model::IAutosarPackages> packages) const noexcept override;
