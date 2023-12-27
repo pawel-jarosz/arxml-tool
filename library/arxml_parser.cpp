@@ -329,7 +329,7 @@ namespace arxml::utilities::parser {
     }
 
 
-    void ArxmlModelBuilder::addEntryFromSource(const std::string& unit_name, utilities::io::IInputSource& source) {
+    void ArxmlFileParser::addEntryFromSource(const std::string& unit_name, utilities::io::IInputSource& source) {
         if (not m_root) {
             m_root = std::move(m_element_factory.createRoot());
         }

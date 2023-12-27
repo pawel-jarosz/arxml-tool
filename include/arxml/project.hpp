@@ -15,9 +15,9 @@ namespace arxml::project {
 
         bool addFile(const std::string& file);
         bool addDirectory(const std::string& directory);
-        const std::vector<std::string>& getFileList() const { return m_files; }
+        [[nodiscard]] const std::vector<std::string>& getFileList() const { return m_files; }
     private:
         std::vector<std::string> m_files;
     };
-
+    
 }

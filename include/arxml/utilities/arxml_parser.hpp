@@ -10,9 +10,9 @@
 
 namespace arxml::utilities::parser {
 
-    class ArxmlModelBuilder {
+    class ArxmlFileParser {
     public:
-        explicit ArxmlModelBuilder(IModelComponentFactory& element_factory)
+        explicit ArxmlFileParser(IModelComponentFactory& element_factory)
         : m_element_factory{element_factory}
         , m_root{}
         {
