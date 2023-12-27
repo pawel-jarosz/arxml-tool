@@ -2,7 +2,7 @@
 // Created by Paweł Jarosz on 27.12.2023.
 //
 
-#include "arxml/dfs/traversal.h"
+#include "arxml/dfs/traversal.hpp"
 
 namespace arxml::dfs {
     class ElementTraversalStrategy {
