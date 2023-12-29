@@ -35,16 +35,16 @@ namespace arxml_tool {
             }
         }
 
-        void find_by_id(const std::string& path, const std::string& tag) {
+        void find_by_id(const std::string& path, const std::string& id) {
             arxml::utilities::DefaultParserFacade parser;
             arxml::project::ModelProject project;
             project.addDirectory(path);
             arxml::project::ModelProject::openModelFromProject(project, parser);
             auto model = parser.getModel();
             std::vector<std::reference_wrapper<arxml::model::INamedAutosarElement>> result;
-            arxml::helpers::ElementByIdFinder callback(result, tag);
+            arxml::helpers::ElementByIdFinder callback(result, id);
             arxml::dfs::traverse_model(*model, callback);
-            std::cout << "Found following entries with " << tag << " tag:\n";
+            std::cout << "Found following entry on path " << id << ":\n";
             if (result.empty()) { std::cout << "none\n"; }
             else {
                 arxml::printer::TreePrinter::stdout_dump(result[0]);
@@ -61,10 +61,20 @@ namespace arxml_tool {
             arxml::helpers::ElementByReferenceFinder callback(result, id);
             arxml::dfs::traverse_model(*model, callback);
             std::cout << "Object " << id << " is referenced in entries:\n";
-            if (result.empty()) { std::cout << "none\n"; }
-            else {
-                std::for_each(result.begin(), result.end(),
-                              [&](const std::string& name) { std::cout << name << std::endl; });
+            if (result.empty()) {
+                std::cout << "none\n";
+                return;
+            }
+            int position = 1;
+            for (const auto& reference: result) {
+                std::cout << position << ". Reference found in element " << reference << std::endl;
+                std::optional<std::pair<std::string, arxml::model::INamedAutosarElement&>> root;
+                arxml::helpers::RootElementFinder root_finder(root, reference);
+                arxml::dfs::traverse_model(*model, root_finder);
+                std::cout << "Root element: " << root.value().first << std::endl;
+                arxml::printer::TreePrinter::stdout_dump(root.value().second);
+                std::cout << std::endl;
+                ++position;
             }
         }
     }
