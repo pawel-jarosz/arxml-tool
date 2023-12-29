@@ -26,6 +26,7 @@ namespace arxml_tool {
         }
         std::string mode = args[1];
         std::string path = args[2];
+        // TODO: Check correctenss of the arguments and paths
         arxml::utilities::DefaultParserFacade parser;
         arxml::project::ModelProject project;
         project.addDirectory(path);
