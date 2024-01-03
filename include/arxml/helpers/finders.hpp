@@ -65,4 +65,18 @@ namespace arxml::helpers {
         std::vector<std::string>& m_result;
         std::vector<std::string> m_path;
     };
+
+    class RootElementFinder : public dfs::TraversalCallback {
+    public:
+        RootElementFinder(std::optional<std::pair<std::string, model::INamedAutosarElement&>>& result,
+                          const std::string& full_path);
+
+        void visit(model::IAutosarElements& elements) override;
+        void visit(model::IAutosarPackage& package) override;
+        void close(model::IAutosarPackage& package) override;
+    private:
+        std::optional<std::pair<std::string, model::INamedAutosarElement&>>& m_result;
+        std::vector<std::string> m_full_path;
+        std::vector<std::string> m_path;
+    };
 }
