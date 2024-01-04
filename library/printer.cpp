@@ -194,8 +194,6 @@ namespace arxml::printer {
                 , m_indent_level{0}
         {}
 
-        ~ArxmlPrinterCallback() = default;
-
         void visit(model::IAutosarModel &root) override;
         void visit(model::IModelEntry &root) override;
         void visit(model::IAutosarPackages &packages) override;
