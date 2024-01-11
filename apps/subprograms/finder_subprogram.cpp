@@ -10,6 +10,8 @@
 #include <arxml/printer.hpp>
 #include <arxml/project.hpp>
 
+#include <arxml_tool/project_content_reader.hpp>
+
 #include <iostream>
 #include <sstream>
 #include <map>
@@ -17,7 +19,7 @@
 namespace arxml_tool {
     namespace {
 
-        void find_by_tag(const std::string& path, const std::string& tag) {
+        void find_by_tag(const std::string& configuration_mode, const std::string& path, const std::string& tag) {
             arxml::utilities::DefaultParserFacade parser;
             arxml::project::ModelProject project;
             project.addDirectory(path);
@@ -35,10 +37,17 @@ namespace arxml_tool {
             }
         }
 
-        void find_by_id(const std::string& path, const std::string& id) {
+        void find_by_id(const std::string& configuration_mode, const std::string& path, const std::string& id) {
             arxml::utilities::DefaultParserFacade parser;
             arxml::project::ModelProject project;
-            project.addDirectory(path);
+            if (configuration_mode == "dir") {
+                project.addDirectory(path);
+            }
+            else if (configuration_mode == "config") {
+                arxml::utilities::io::FileSource source(path);
+                ProjectContentReader<YamlProjectFileParser> reader(project);
+                reader.read(source);
+            }
             arxml::project::ModelProject::openModelFromProject(project, parser);
             auto model = parser.getModel();
             std::vector<std::reference_wrapper<arxml::model::INamedAutosarElement>> result;
@@ -51,11 +60,17 @@ namespace arxml_tool {
             }
         }
 
-        void find_by_ref(const std::string& path, const std::string& id) {
+        void find_by_ref(const std::string& configuration_mode, const std::string& path, const std::string& id) {
             arxml::utilities::DefaultParserFacade parser;
             arxml::project::ModelProject project;
-            project.addDirectory(path);
-            arxml::project::ModelProject::openModelFromProject(project, parser);
+            if (configuration_mode == "dir") {
+                project.addDirectory(path);
+            }
+            else if (configuration_mode == "config") {
+                arxml::utilities::io::FileSource source(path);
+                ProjectContentReader<YamlProjectFileParser> reader(project);
+                reader.read(source);
+            }            arxml::project::ModelProject::openModelFromProject(project, parser);
             auto model = parser.getModel();
             std::vector<std::string> result;
             arxml::helpers::ElementByReferenceFinder callback(result, id);
@@ -96,13 +111,13 @@ namespace arxml_tool {
         std::string name = args[4];
 
         if (mode == "by_tag") {
-            find_by_tag(path, name);
+            find_by_tag(project_configuration, path, name);
         }
         else if (mode == "by_id") {
-            find_by_id(path, name);
+            find_by_id(project_configuration, path, name);
         }
         else if (mode == "by_ref") {
-            find_by_ref(path, name);
+            find_by_ref(project_configuration, path, name);
         }
     }
 

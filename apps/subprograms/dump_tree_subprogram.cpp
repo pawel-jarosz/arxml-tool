@@ -7,6 +7,8 @@
 #include <iostream>
 #include <sstream>
 
+#include <arxml_tool/project_content_reader.hpp>
+
 #include <arxml/utilities/parser_facade.hpp>
 #include <arxml/printer.hpp>
 #include <arxml/project.hpp>
@@ -29,7 +31,14 @@ namespace arxml_tool {
         // TODO: Check correctenss of the arguments and paths
         arxml::utilities::DefaultParserFacade parser;
         arxml::project::ModelProject project;
-        project.addDirectory(path);
+        if (mode == "dir") {
+            project.addDirectory(path);
+        }
+        else if (mode == "config") {
+            arxml::utilities::io::FileSource source(path);
+            ProjectContentReader<YamlProjectFileParser> reader(project);
+            reader.read(source);
+        }
         arxml::project::ModelProject::openModelFromProject(project, parser);
         auto result = parser.getModel();
         arxml::printer::TreePrinter::stdout_dump(*result);

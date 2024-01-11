@@ -8,6 +8,8 @@
 #include <sstream>
 #include <iomanip>
 
+#include <arxml_tool/project_content_reader.hpp>
+
 #include <arxml/utilities/parser_facade.hpp>
 #include <arxml/dfs/callbacks.hpp>
 #include <arxml/dfs/traversal.hpp>
@@ -185,7 +187,14 @@ namespace arxml_tool {
         std::string path = args[2];
         arxml::utilities::DefaultParserFacade parser;
         arxml::project::ModelProject project;
-        project.addDirectory(path);
+        if (project_configuration == "dir") {
+            project.addDirectory(path);
+        }
+        else if (project_configuration == "config") {
+            arxml::utilities::io::FileSource source(path);
+            ProjectContentReader<YamlProjectFileParser> reader(project);
+            reader.read(source);
+        }
         arxml::project::ModelProject::openModelFromProject(project, parser);
         auto model = parser.getModel();
         ModelGraph graph;
